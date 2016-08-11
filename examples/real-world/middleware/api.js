@@ -22,6 +22,7 @@ const API_ROOT = 'https://api.github.com/'
 // Fetches an API response and normalizes the result JSON according to schema.
 // This makes every API response have the same shape, regardless of how nested it was.
 function callApi(endpoint, schema) {
+  console.log('callApi is called');
   const fullUrl = (endpoint.indexOf(API_ROOT) === -1) ? API_ROOT + endpoint : endpoint
 
   return fetch(fullUrl)
@@ -35,10 +36,13 @@ function callApi(endpoint, schema) {
       const camelizedJson = camelizeKeys(json)
       const nextPageUrl = getNextPageUrl(response)
 
-      return Object.assign({},
+      var temp = Object.assign({},
         normalize(camelizedJson, schema),
         { nextPageUrl }
       )
+      console.log('promise returning')
+      console.log(temp)
+      return temp
     })
 }
 
@@ -63,6 +67,7 @@ const repoSchema = new Schema('repos', {
   idAttribute: repo => repo.fullName.toLowerCase()
 })
 
+// Lets you specify relationships between different entities.
 repoSchema.define({
   owner: userSchema
 })
@@ -79,20 +84,30 @@ export const Schemas = {
 export const CALL_API = Symbol('Call API')
 
 // A Redux middleware that interprets actions with CALL_API info specified.
+// CALL_API is specified from within an action in actions/index.js
 // Performs the call and promises when such actions are dispatched.
 export default store => next => action => {
+  // console.log('-----')
+  // console.log(store)
+  // console.log(next)
+  // console.log('-----')
   const callAPI = action[CALL_API]
+  // If the callAPI is not involved, pass control to the next middleware
   if (typeof callAPI === 'undefined') {
     return next(action)
   }
 
+  console.log('middleware running')
+
   let { endpoint } = callAPI
   const { schema, types } = callAPI
 
+  // endpoint is a function when it stands for the next page
   if (typeof endpoint === 'function') {
     endpoint = endpoint(store.getState())
   }
 
+  // These are just error checks
   if (typeof endpoint !== 'string') {
     throw new Error('Specify a string endpoint URL.')
   }
@@ -106,16 +121,31 @@ export default store => next => action => {
     throw new Error('Expected action types to be strings.')
   }
 
+  // just a building blog to compile the final action
   function actionWith(data) {
+    console.log(action);
+    console.log(data);
+    // action is Symbol(Call API): Object
+    // Symbol(Call API): Object
+    //   endpoint: "users/kstratis"
+    //   schema: EntitySchema
+    //   types: Array[3]
+    // data is Object {type: "USER_REQUEST"}
     const finalAction = Object.assign({}, action, data)
+    console.log(finalAction)
+    // We already have the symbol data stored in {endpoint, schema, types}
     delete finalAction[CALL_API]
+    console.log(finalAction)
     return finalAction
   }
 
   const [ requestType, successType, failureType ] = types
+  // next is the logger middleware here
+  console.log('This should be displayed just before the logs');
   next(actionWith({ type: requestType }))
 
   return callApi(endpoint, schema).then(
+
     response => next(actionWith({
       response,
       type: successType

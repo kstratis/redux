@@ -23,6 +23,7 @@ function errorMessage(state = null, action) {
     return action.error
   }
 
+  // This is the default case
   return state
 }
 

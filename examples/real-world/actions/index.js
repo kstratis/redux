@@ -7,6 +7,7 @@ export const USER_FAILURE = 'USER_FAILURE'
 // Fetches a single user from Github API.
 // Relies on the custom API middleware defined in ../middleware/api.js.
 function fetchUser(login) {
+  console.log('fetchUser was just called');
   return {
     [CALL_API]: {
       types: [ USER_REQUEST, USER_SUCCESS, USER_FAILURE ],
@@ -18,13 +19,17 @@ function fetchUser(login) {
 
 // Fetches a single user from Github API unless it is cached.
 // Relies on Redux Thunk middleware.
+// login is what we type in the input field
 export function loadUser(login, requiredFields = []) {
   return (dispatch, getState) => {
     const user = getState().entities.users[login]
+    // The every() method tests whether all elements in the array
+    // pass the test implemented by the provided function.
     if (user && requiredFields.every(key => user.hasOwnProperty(key))) {
       return null
     }
 
+    console.log('-=dispatching fetchUser=-');
     return dispatch(fetchUser(login))
   }
 }
@@ -89,6 +94,7 @@ export function loadStarred(login, nextPage) {
       return null
     }
 
+    console.log('-=dispatching fetchStarred=-');
     return dispatch(fetchStarred(login, nextPageUrl))
   }
 }
@@ -120,6 +126,7 @@ export function loadStargazers(fullName, nextPage) {
       pageCount = 0
     } = getState().pagination.stargazersByRepo[fullName] || {}
 
+    // This if statement here prevents errors
     if (pageCount > 0 && !nextPage) {
       return null
     }

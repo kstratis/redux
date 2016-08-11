@@ -6,10 +6,15 @@ import Repo from '../components/Repo'
 import List from '../components/List'
 import zip from 'lodash/zip'
 
+// Loads data from the url
 function loadData(props) {
+  console.log('PRINTING WILLMOUNT PROPS')
+  console.log(props)
   const { login } = props
   props.loadUser(login, [ 'name' ])
-  props.loadStarred(login)
+  console.log('FINISHED LOADING THE USER');
+  props.loadStarred(login);
+  console.log('FINISHED LOADING THE STARRED');
 }
 
 class UserPage extends Component {
@@ -19,16 +24,19 @@ class UserPage extends Component {
     this.handleLoadMoreClick = this.handleLoadMoreClick.bind(this)
   }
 
+  // Load the data before mounting
   componentWillMount() {
     loadData(this.props)
   }
 
+  // If the user is changed, reload the data.
   componentWillReceiveProps(nextProps) {
     if (nextProps.login !== this.props.login) {
       loadData(nextProps)
     }
   }
 
+  // Load the second page of results etc.
   handleLoadMoreClick() {
     this.props.loadStarred(this.props.login, true)
   }
@@ -42,6 +50,7 @@ class UserPage extends Component {
   }
 
   render() {
+    // user comes from map state to props
     const { user, login } = this.props
     if (!user) {
       return <h1><i>Loading {login}'s profile...</i></h1>

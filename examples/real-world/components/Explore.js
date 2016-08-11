@@ -2,6 +2,8 @@ import React, { Component, PropTypes } from 'react'
 
 const GITHUB_REPO = 'https://github.com/reactjs/redux'
 
+// This class is not connected to redux but is getting props from the
+// container component only! No redux connect method
 export default class Explore extends Component {
   constructor(props) {
     super(props)
@@ -9,6 +11,8 @@ export default class Explore extends Component {
     this.handleGoClick = this.handleGoClick.bind(this)
   }
 
+  // See what the ref is here:
+  // https://facebook.github.io/react/docs/more-about-refs.html#the-ref-string-attribute
   componentWillReceiveProps(nextProps) {
     if (nextProps.value !== this.props.value) {
       this.setInputValue(nextProps.value)
@@ -26,12 +30,15 @@ export default class Explore extends Component {
     this.refs.input.value = val
   }
 
+  // 13 is the Enter key
   handleKeyUp(e) {
     if (e.keyCode === 13) {
       this.handleGoClick()
     }
   }
 
+  // onChange is the change route function that we get from the container.
+  // this.getInputValue is the text input or in other words the new route path
   handleGoClick() {
     this.props.onChange(this.getInputValue())
   }
