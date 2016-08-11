@@ -123,8 +123,8 @@ export default store => next => action => {
 
   // just a building blog to compile the final action
   function actionWith(data) {
-    console.log(action);
-    console.log(data);
+    // console.log(action);
+    // console.log(data);
     // action is Symbol(Call API): Object
     // Symbol(Call API): Object
     //   endpoint: "users/kstratis"
@@ -132,7 +132,7 @@ export default store => next => action => {
     //   types: Array[3]
     // data is Object {type: "USER_REQUEST"}
     const finalAction = Object.assign({}, action, data)
-    console.log(finalAction)
+    // console.log(finalAction)
     // We already have the symbol data stored in {endpoint, schema, types}
     delete finalAction[CALL_API]
     console.log(finalAction)
@@ -142,8 +142,13 @@ export default store => next => action => {
   const [ requestType, successType, failureType ] = types
   // next is the logger middleware here
   console.log('This should be displayed just before the logs');
-  next(actionWith({ type: requestType }))
 
+  // the main purpose of this particular request is to set at most
+  // is fetching to true
+  console.log('before next')
+  next(actionWith({ type: requestType }))
+  console.log('after next')
+  // this is the real state changer
   return callApi(endpoint, schema).then(
 
     response => next(actionWith({

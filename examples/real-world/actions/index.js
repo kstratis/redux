@@ -85,6 +85,8 @@ function fetchStarred(login, nextPageUrl) {
 // Relies on Redux Thunk middleware.
 export function loadStarred(login, nextPage) {
   return (dispatch, getState) => {
+    console.log('STARRED BY USER IS:')
+    console.log(getState().pagination.starredByUser);
     const {
       nextPageUrl = `users/${login}/starred`,
       pageCount = 0

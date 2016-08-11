@@ -50,7 +50,7 @@ class UserPage extends Component {
   }
 
   render() {
-    // user comes from map state to props
+    // user comes from mapStateToProps
     const { user, login } = this.props
     if (!user) {
       return <h1><i>Loading {login}'s profile...</i></h1>
@@ -91,7 +91,10 @@ function mapStateToProps(state, ownProps) {
     entities: { users, repos }
   } = state
 
+  // console.log('THIS IS THE LOG');
+  // console.log(starredByUser);
   const starredPagination = starredByUser[login] || { ids: [] }
+  // console.log(starredPagination);
   const starredRepos = starredPagination.ids.map(id => repos[id])
   const starredRepoOwners = starredRepos.map(repo => users[repo.owner])
 
